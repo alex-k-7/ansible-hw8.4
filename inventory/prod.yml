@@ -1,13 +1,6 @@
 ---
-  el:
-    hosts:
-      centos7:
-        ansible_connection: docker
-  deb:
-    hosts:
-      ubuntu:
-        ansible_connection: docker
-  local:
-    hosts:
-      localhost:
-        ansible_connection: local
+elk:
+  hosts:
+    ubuntu:
+      ansible_connection: ssh
+      ansible_user: root
