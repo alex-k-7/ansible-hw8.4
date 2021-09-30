@@ -67,7 +67,7 @@
     - name: Set environment Elastic
       become: true
       template:
-        src: templates/elk.sh.j2
+        src: elk.sh.j2
         dest: /etc/profile.d/elk.sh
       tags: elastic
 - name: Install Kibana
@@ -102,6 +102,6 @@
     - name: Set environment Kibana
       become: true
       template:
-        src: templates/kibana.sh.j2
+        src: kibana.sh.j2
         dest: /etc/profile.d/kibana.sh
       tags: kibana
