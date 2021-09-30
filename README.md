@@ -1,3 +1,4 @@
+```yaml
 - name: Install Kibana #имя плейбука  
   hosts: elk #хосты на которых выполнять таски
   tasks:
@@ -33,3 +34,4 @@
         src: templates/kibana.sh.j2
         dest: /etc/profile.d/kibana.sh
       tags: kibana
+```
