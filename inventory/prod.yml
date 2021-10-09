@@ -1,6 +1,0 @@
----
-elk:
-  hosts:
-    ubuntu:
-      ansible_connection: ssh
-      ansible_user: root
