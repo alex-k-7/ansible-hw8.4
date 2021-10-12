@@ -1,0 +1,21 @@
+---
+all:
+  hosts:
+    el-instance:
+    k-instance:
+    app-instance:
+  vars:
+    ansible_connection: ssh
+    ansible_user: aks
+elasticsearch:
+  hosts:
+    el-instance:
+      ansible_host: 178.154.192.239
+kibana:
+  hosts:
+    k-instance:
+      ansible_host: 178.154.198.150
+filebeat:
+  hosts:
+    app-instance:
+      ansible_host: 178.154.195.186
