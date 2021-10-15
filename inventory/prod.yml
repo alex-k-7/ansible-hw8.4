@@ -8,9 +8,3 @@ all:
   vars:
     ansible_connection: ssh
     ansible_user: aks
-#elasticsearch:
-#  hosts:
-#    ubuntu:
-#      ansible_host: 62.84.123.136
-#    centos:
-#      ansible_host: 130.193.53.96
