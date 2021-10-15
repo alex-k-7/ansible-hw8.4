@@ -1,99 +1,98 @@
+ ###Kibana-role
+Роль состоит из следующих заданий:
+
+precheck.yml:
 ```yaml
 ---
-- name: Install Elasticsearch             # Play установки и настройки Elasticsearch
-  hosts: elasticsearch
-  handlers:                               # хэндлер на перезапуск сервиса, также активирует автозапуск 
-   - name: restart Elasticsearch
-     become: true
-     systemd:                         
-       name: elasticsearch          
-       state: restarted
-       enabled: true
-  tasks:                           
-   - name: Download Elasticsearch's rpm 
-     get_url:                             # скачивает пакет Elasticsearch в <dest>
-       url: "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{{ elk_stack_version }}-x86_64.rpm"
-       dest: "/tmp/elasticsearch-{{ elk_stack_version }}-x86_64.rpm"
-     register: download_elastic           # писать результаты выполнения get_url в переменную download_elastic
-     until: download_elastic is succeeded # повторять get_url пока не выполнится удачно (но не более 3х раз)
-   - name: Install Elasticsearch
-     become: true
-     yum:                                 # установка пакета <name>
-       name: "/tmp/elasticsearch-{{ elk_stack_version }}-x86_64.rpm"
-       state: present
-   - name: Configure Elasticsearch
-     become: true                         # повышение привилегий
-     template:                            # копирует файл конфигурации Elasticsearch из <src> в <dest>. при этом умеет интерполировать переменные
-       src: elasticsearch.yml.j2
-       dest: /etc/elasticsearch/elasticsearch.yml
-     notify: restart Elasticsearch        # активация действия в handlers при наличии изменений в данной таске
-
-- name: Install Kibana                    # Play установки и настройки Kibana (идентичен предыдущему)
-  hosts: kibana
-  handlers:
-   - name: restart Kibana
-     become: true
-     systemd:
-       name: kibana
-       state: restarted
-       enabled: true
-  tasks:
-   - name: Download Kibana's rpm
-     get_url:
-       url: "https://artifacts.elastic.co/downloads/kibana/kibana-{{ elk_stack_version }}-x86_64.rpm"
-       dest: "/tmp/kibana-{{ elk_stack_version }}-x86_64.rpm"
-     register: download_elastic
-     until: download_elastic is succeeded
-   - name: Install Kibana
-     become: true
-     yum:
-       name: "/tmp/kibana-{{ elk_stack_version }}-x86_64.rpm"
-       state: present
-   - name: Configure Kibana
-     become: true
-     template:
-       src: kibana.yml.j2
-       dest: /etc/kibana/kibana.yml
-     notify: restart Kibana
-
-- name: Install Filebeat                  # Play установки и настройки Filebeat (идентичен предыдущему)
-  hosts: filebeat
-  handlers:
-   - name: restart filebeat
-     become: true
-     systemd:
-       name: filebeat
-       state: restarted
-       enabled: true
-  tasks:
-   - name: Download filebeat's rpm"
-     get_url:
-       url: "https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{ elk_stack_version }}-x86_64.rpm"
-       dest: "/tmp/filebeat-{{ elk_stack_version }}-x86_64.rpm"
-     register: download_fb
-     until: download_fb is succeeded
-   - name: Install Filebeat
-     become: true
-     yum:
-       name: "/tmp/filebeat-{{ elk_stack_version }}-x86_64.rpm"
-       state: present
-   - name: Configure Filebeat
-     become: true
-     template:
-       src: filebeat.yml.j2
-       dest: /etc/filebeat/filebeat.yml
-     notify: restart filebeat
-   - name: Set Filebeat systemwork        # настройка filebeat на передачу в elasticsearch системных логов
-     become: true
-     command:                             # выполнение команды <cmd> из директории <chdir>       
-       cmd: filebeat modules enable system
-       chdir: /usr/share/filebeat/bin
-   - name: Load Kibana dashboard          # установка дашбордов в kibana
-     become: true
-     command:
-       cmd: filebeat setup
-       chdir: /usr/share/filebeat/bin
-     register: fb_setup
-     until: fb_setup is succeeded
-     notify: restart filebeat
+- name: Fail if unsupported system detected
+  fail:
+    msg: "System {{ ansible_distribution }} is not support by this role"
+  when: ansible_distribution not in supported_systems
 ```
+
+Проверяет поддерживаемые ОС, которые указаны в переменной [supported_systems].
+Переменная указана в файле main.yml каталога vars:
+```yaml
+---
+supported_systems: ['CentOS', 'Red Hat Enterprise Linux', 'Ubuntu', 'Debian']
+```
+---
+download_apt.yml:
+```yaml
+---
+- name: Download Kibana's deb
+  get_url:
+    url: "https://artifacts.elastic.co/downloads/kibana/kibana-{{ kb_version }}-amd64.deb"
+    dest: "/tmp/kibana-{{ kb_version }}-amd64.deb"
+  register: download_kb
+  until: download_kb is succeeded
+
+```
+Скачивает deb пакет Kibana в директорию tmp целевой машины (делает 3 попытки). Данная таска используется, если ОС целевой машины Debian/Ubuntu. 
+Версия приложения указана в переменной [kb_version], находящейся в файле main.yml директории defaults:
+```yaml
+---
+kb_version: "{{ elk_stack_version }}" # переменная elk_stack_version находится в group_vars
+```
+---
+download_yum.yml:
+
+Всё аналагично предыдущему заданию, но для ОС CentOS/RedHat.
+
+---
+install_yum.yml:
+```yaml
+---
+- name: Install Kibana
+  become: true
+  yum:
+    name: "/tmp/kibana-{{ elk_stack_version }}-x86_64.rpm"
+    state: present
+  notify: restart Kibana
+```
+Установка Kibana для ОС CentOS/RedHat с вызовом хэндлера перезагрузки сервиса kibana.
+handlers/main.yml:
+```yaml
+---
+- name: restart Kibana
+  become: true
+  systemd:
+    name: kibana
+    state: restarted
+    enabled: true
+
+```
+---
+install_apt.yml:
+
+Всё аналагично предыдущему заданию, но для ОС Debian/Ubuntu.
+
+---
+configure.yml:
+```yaml
+---
+- name: Configure Kibana
+  become: true
+  template:
+    src: kibana.yml.j2
+    dest: /etc/kibana/kibana.yml
+  notify: restart Kibana
+```
+Копирует конфиг файл kibana из директории templates роли на целевую машину.
+
+---
+main.yml:
+
+Файл описывающий выполняемые задания из директории tasks. Указана переменная из собранных фактов. 
+Определяет пакетный менеджер ОС и в зависимости от этого запускается либо задание download_apt.yml, либо
+download_yum.yml. То же самое для задания установки пакета.
+```yaml
+---
+- import_tasks: precheck.yml  # 
+- include_tasks: "download_{{ ansible_facts.pkg_mgr }}.yml"
+- include_tasks: "install_{{ ansible_facts.pkg_mgr }}.yml" 
+- import_tasks: configure.yml
+```
+---
+
+Filebeat-role идентична kibana-role.

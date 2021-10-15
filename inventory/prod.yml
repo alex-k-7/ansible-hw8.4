@@ -1,21 +1,16 @@
 ---
 all:
   hosts:
-    el-instance:
-    k-instance:
-    app-instance:
+    ubuntu:
+      ansible_host: 62.84.123.90
+    centos:
+      ansible_host: 62.84.121.222
   vars:
     ansible_connection: ssh
     ansible_user: aks
-elasticsearch:
-  hosts:
-    el-instance:
-      ansible_host: 178.154.192.239
-kibana:
-  hosts:
-    k-instance:
-      ansible_host: 178.154.198.150
-filebeat:
-  hosts:
-    app-instance:
-      ansible_host: 178.154.195.186
+#elasticsearch:
+#  hosts:
+#    ubuntu:
+#      ansible_host: 62.84.123.136
+#    centos:
+#      ansible_host: 130.193.53.96
