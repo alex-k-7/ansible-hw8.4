@@ -1,3 +1,5 @@
+Playbook поднимает elastic+kibana+filebeat на одном хосте YndexCloud, использея репозитории с ролями
+
 Kibana-role
 ---
  
