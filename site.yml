@@ -2,6 +2,6 @@
 - name: Install ELK
   hosts: all
   roles:
-    - elastic
     - kibana-role
     - filebeat-role
+    - elastic
