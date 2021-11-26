@@ -1,8 +1,8 @@
 ---
 all:
   hosts:
-    ubuntu:
-      ansible_host: 62.84.123.90
+#    ubuntu:
+#      ansible_host: 62.84.123.90
     centos:
       ansible_host: 62.84.121.222
   vars:
