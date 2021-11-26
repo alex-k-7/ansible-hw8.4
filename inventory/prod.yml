@@ -4,7 +4,7 @@ all:
 #    ubuntu:
 #      ansible_host: 62.84.123.90
     centos:
-      ansible_host: 62.84.121.222
+      ansible_host: 51.250.16.250
   vars:
     ansible_connection: ssh
     ansible_user: aks
