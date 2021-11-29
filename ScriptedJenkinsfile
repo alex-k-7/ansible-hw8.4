@@ -1,0 +1,18 @@
+node('linux') {
+    stage('Checkout'){
+        git branch: 'main', credentialsId: '8043bfc7-5ee2-42d2-9984-a49fda22d32e', url: 'git@github.com:alex-k-7/ansible-hw8.4.git'
+        sh 'ansible-galaxy install -r requirements.yml'
+    }
+    stage("Sample define prod_run"){
+        prod_run=true
+    }
+    stage("Run playbook"){
+        if (params.prod_run){
+            sh 'ansible-playbook site.yml -i inventory/prod.yml'
+        }
+        else{
+            sh 'ansible-playbook site.yml -i inventory/prod.yml --check --diff' 
+        }
+        
+    }
+}
