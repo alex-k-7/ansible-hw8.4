@@ -4,4 +4,4 @@
   roles:
     - kibana-role
     - filebeat-role
-    - elastic
+    - elastic-role
