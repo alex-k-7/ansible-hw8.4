@@ -2,9 +2,9 @@
   - src: https://github.com/alex-k-7/elastic-role.git
     version: "2.0.0"
     name: elastic-role
-  - src: git@github.com:alex-k-7/kibana-role.git
+  - src: https://github.com/alex-k-7/kibana-role.git
     version: "1.0.1"
     name: kibana-role
-  - src: git@github.com:alex-k-7/filebeat-role.git
+  - src: https://github.com/alex-k-7/filebeat-role.git
     version: "1.0.2"
     name: filebeat-role
